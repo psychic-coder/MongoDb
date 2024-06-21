@@ -162,3 +162,130 @@ in the below example--> in the comments collection we're checking each data wher
 db.comments.find({"comments":{$size:2}})
 
 <!-- -------------------------------------------------------------------------------- -->
+Projection
+To include specific fields ,use projection with a value of 1 for the fields you want
+To exclude fields , use Projection with a value of 0, for the fields you want to exclude .
+You cannot include and exclude fields simultaneously in the same query projection
+
+ex-->db.collection.find({},{field1:1,field2:1})
+
+//in the below code we're fetching all the  comments arrays fields from the data where the comments array has a size of 2
+db.comments.find({"comments":{$size:2}},{comments:1})
+
+<!-- another example we're we excluded the _id -->
+db.comments.find({"comments":{$size:2}},{comments:1,_id:0})
+
+<!-- -------------------------------------------------------------------------------- -->
+Embedded Docs
+
+query documents inside embedded docs using dot notation
+
+db.collection.find({"parent.child":value})
+ex-
+
+the user inside comments was an object inside an array
+db.comments.find({"comments.user":"Lily"})
+
+the views field inside the metadata is an object
+db.comments.find({"metadata.views":{$gt:1200}})
+
+<!-- -------------------------------------------------------------------------------- -->
+
+$all
+it is an operator selects the documents where the value of a field of a is an array that contains all the specified elements
+{<field>:{$all:[<value1>,<value2>,...]}}
+ex-
+//both binod and alice have to be present in the user field of comments array then only this is true 
+db.comments.find({"comments.user":{$all:["alice","binod"]}})
+
+$elemMatch
+It is used to match documents that contain an array field with at least one element that matches all the specified query criteria.
+{<field>:{$elemMatch:{<query1>,<query2>,...}}}
+ex--->both the user field and the text field have should be true for each element of  the comment array
+db.comments.find({"comments":{$elemMatch:{"user":"Vinod","text":"hello"}}})
+
+<!-- -------------------------------------------------------------------------------- -->
+Update operations in MongoDb
+
+UpdateOne and UpdateMany()
+db.collectionName.updateOne({filter},{$set:{existingField:"new value",newField:"new value"}})
+ex->
+//adding a new field
+db.collectionName.updateOne({"_id":32134},{$set:{existingField:"newValue",newField:"new value"}})
+
+//adding a new field
+db.collectionName.updateMany({filter},{$set:{existingField:"new value",newField:"new value"}})
+
+Removing and Renaming the fields :---
+//deleting a field
+db.collectionName.updateOne({filter},{$unset:{existingField:"new value"}})
+//renaming a field
+db.collectionName.updateOne({filter},{$rename:{existingField:"new value"}})
+
+Updating arrays and embedded documents:---
+
+db.collectionName.updateOne({filter},{$push:{"arrayField":"newElement"}})
+ex->db.collectionName.updateOne({"_id":5},{$push:{"comments":{"user":"aron","text":"subscribe"}}})
+
+
+db.collectionName.updateOne({filter},{$pop:{"arrayField":"newElement"}})
+ex-->db.collectionName.updateOne({"_id":5},{$pop:{"comments":1}})
+
+db.collectionName.updateOne({filter},{$set:{"arrayField.$.text":"newElement"}})
+ex-->db.collectionName.updateOne({_id:7,"comments.user":"Alice"},{$set:{"comments.$.text":"Awesome Thapa"}})
+
+<!-- -------------------------------------------------------------------------------- -->
+Delete Operations in MongoDb
+
+db.collectionName.deleteOne({filter});
+ex:-->db.sales.deleteOne({_id:1})
+
+db.collectionName.deleteMany({field:"value"});
+ex:-->db.sales.deleteMany({"price":55})
+
+<!-- -------------------------------------------------------------------------------- -->
+Indexes
+-->specialized data structure that optimize data retrieval speed in mongoDB
+-->enable MongoDB to locate data daster during queries
+
+
+explain()
+its used to understand the query execution in detail
+it returns all the details we require to excute a query
+ex:-
+its used to measure the time taken to execute a query
+db.products.find({"name":"air fryer"}).explain("executionStats")
+
+Managing Indexes:------
+//for setting the index
+db.products.createIndex({field:1})
+ex:---
+db.products.createIndex({field:1})
+db.products.createIndex({"name":1})
+(1) for storing the indexes in ascending order
+(-1) for storing the indexes in descending order
+
+//to get the index
+db.collection.getIndexes()
+_id is a default index
+
+//for dropping the index
+db.collection.dropIndex({field:1})
+db.collection.dropIndex({"name":1})
+
+<!-- -------------------------------------------------------------------------------- -->
+
+Aggregation in MongoDB
+aggregation:-- process of transforming and combining multiple documents into computed results 
+pipeline stages:--  aggregation consists of multiple stages , each performing a specific operation to the input data 
+
+$match -->its similar to the query as the first argument in .find() . It filters documents based on specified conditions .
+ex-->
+db.products.aggregate([{$match:{company:"Samsung"}}])
+db.products.aggregate([{$match:{"price":{$gt:50}}}])
+
+<!-- -------------------------------------------------------------------------------- -->
+$group
+it groups docs by the specified fields and performs aggregate operations on grouped data
+db.gro
+
